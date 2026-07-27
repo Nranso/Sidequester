@@ -543,7 +543,7 @@ Make one quest Easy, one Medium, one Hard. Make each distinctly different — no
     // proxy this request through your own backend (e.g. a small serverless function) that
     // holds the key server-side. The corsproxy.io relay has been removed here since it added
     // an unreliable third-party dependency on top of the key-exposure issue.
-    const ANTHROPIC_API_KEY = 'YOUR_API_KEY_HERE';
+    const ANTHROPIC_API_KEY = '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';
     const targetUrl = 'https://api.anthropic.com/v1/messages';
 
     const resp = await fetch(targetUrl, {
@@ -552,7 +552,7 @@ Make one quest Easy, one Medium, one Hard. Make each distinctly different — no
         'Content-Type': 'application/json',
         'x-api-key': ANTHROPIC_API_KEY,
         'anthropic-version': '2023-06-01',
-        'anthropic-dangerously-allow-browser': 'true'
+        'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-6',
