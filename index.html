@@ -6,122 +6,539 @@
 <title>Side Quest — Find Your Next Adventure</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2 family=Syne:wght@400;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-/* ... Keep your existing sidequests CSS styles here ... */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0C0C10;--surface:#15151C;--surface2:#1E1E28;--surface3:#252532;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.14);
+  --accent:#7C5CFC;--accent2:#C084FC;--gold:#F5A623;
+  --text:#F0EEF8;--muted:rgba(240,238,248,0.5);--muted2:rgba(240,238,248,0.3);
+  --danger:#FC5C7D;--green:#4ADE80;--blue:#60A5FA;
+  --r:12px;--r-lg:18px;--r-xl:24px;
+}
+body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:16px;line-height:1.6;min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background-image:
+  radial-gradient(1px 1px at 15% 20%,rgba(255,255,255,0.4) 0%,transparent 100%),
+  radial-gradient(1px 1px at 42% 8%,rgba(255,255,255,0.3) 0%,transparent 100%),
+  radial-gradient(1px 1px at 70% 35%,rgba(255,255,255,0.5) 0%,transparent 100%),
+  radial-gradient(1px 1px at 88% 12%,rgba(255,255,255,0.3) 0%,transparent 100%),
+  radial-gradient(1px 1px at 25% 60%,rgba(255,255,255,0.2) 0%,transparent 100%),
+  radial-gradient(1px 1px at 60% 75%,rgba(255,255,255,0.4) 0%,transparent 100%),
+  radial-gradient(1px 1px at 5% 85%,rgba(255,255,255,0.3) 0%,transparent 100%),
+  radial-gradient(1px 1px at 95% 60%,rgba(255,255,255,0.3) 0%,transparent 100%),
+  radial-gradient(2px 2px at 50% 45%,rgba(124,92,252,0.25) 0%,transparent 100%);
+  pointer-events:none;z-index:0}
 
-/* Auth UI Overlay Overlays */
-#auth-overlay {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 9999;
-}
-.auth-box {
-  background: var(--surface); border: 1px solid var(--border); padding: 2.5rem; border-radius: 16px;
-  width: 100%; max-width: 400px; text-align: center;
-}
-.auth-input {
-  width: 100%; padding: 0.85rem; margin: 0.5rem 0; background: var(--surface2);
-  border: 1px solid var(--border); border-radius: 8px; color: var(--text); font-family: 'Inter', sans-serif;
-}
-.coffee-btn {
-  background: #FFDD00; color: #000000; font-weight: 700; border: none; padding: 0.6rem 1.2rem;
-  border-radius: 8px; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 0.5rem;
-}
-.top-bar {
-  display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;
+/* ── NAV ── */
+nav{padding:1.1rem 0;border-bottom:1px solid var(--border);position:relative;z-index:10}
+.nav-inner{max-width:860px;margin:0 auto;padding:0 1.5rem;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem;color:var(--text);display:flex;align-items:center;gap:8px;text-decoration:none;cursor:pointer}
+.logo-icon{width:28px;height:28px;background:linear-gradient(135deg,var(--accent),var(--accent2));border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.nav-right{display:flex;align-items:center;gap:10px}
+.coffee-btn{background:#FFDD00;color:#000000;font-weight:700;border:none;padding:0.6rem 1.2rem;border-radius:100px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;gap:0.5rem;font-size:0.85rem;transition:transform 0.1s,opacity 0.15s}
+.coffee-btn:hover{opacity:0.9;transform:scale(1.02)}
+
+/* ── CONTAINER ── */
+.container{max-width:860px;margin:0 auto;padding:0 1.5rem;position:relative;z-index:1}
+
+/* ── HERO ── */
+.hero{padding:3.5rem 0 2rem;text-align:center}
+.hero-eyebrow{font-size:12px;letter-spacing:0.12em;text-transform:uppercase;color:var(--accent2);margin-bottom:0.9rem;font-weight:500}
+.hero h1{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(2rem,6vw,3.4rem);line-height:1.1;margin-bottom:0.9rem;background:linear-gradient(135deg,#fff 30%,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero p{color:var(--muted);font-size:1rem;max-width:460px;margin:0 auto 2rem}
+.progress-wrap{display:flex;align-items:center;gap:8px;margin-bottom:2rem;justify-content:center}
+.progress-step{width:28px;height:4px;border-radius:100px;background:var(--surface2);transition:background 0.3s}
+.progress-step.active{background:var(--accent)}
+.progress-step.done{background:var(--accent2)}
+
+/* ── STEP CARD ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.75rem;margin-bottom:1.5rem}
+.step{display:none;animation:fadeIn 0.22s ease}
+.step.active{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.section-label{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:0.12em;color:var(--accent2);margin-bottom:0.6rem}
+.card h2{font-family:'Syne',sans-serif;font-weight:700;font-size:1.35rem;margin-bottom:0.3rem;color:var(--text)}
+.card .subtitle{color:var(--muted);font-size:0.9rem;margin-bottom:1.5rem}
+
+/* ── TILES ── */
+.tile-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:1.25rem}
+.tile{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r);padding:0.9rem 0.75rem;cursor:pointer;transition:border-color 0.15s,background 0.15s;text-align:center;user-select:none}
+.tile:hover{border-color:rgba(124,92,252,0.4);background:rgba(124,92,252,0.06)}
+.tile.selected{border-color:var(--accent);background:rgba(124,92,252,0.12)}
+.tile-icon{font-size:1.6rem;margin-bottom:5px;display:block}
+.tile-label{font-size:0.85rem;font-weight:500;color:var(--text)}
+.tile-sub{font-size:0.75rem;color:var(--muted);margin-top:2px}
+
+/* ── OCCASION FILTER ── */
+.occasion-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:1.25rem;scrollbar-width:none}
+.occasion-scroll::-webkit-scrollbar{display:none}
+.occasion-chip{flex-shrink:0;padding:7px 16px;border-radius:100px;border:1px solid var(--border2);background:var(--surface2);font-size:0.83rem;cursor:pointer;color:var(--muted);transition:all 0.15s;white-space:nowrap;user-select:none}
+.occasion-chip:hover{border-color:rgba(124,92,252,0.4);color:var(--text)}
+.occasion-chip.on{border-color:var(--accent);background:rgba(124,92,252,0.14);color:var(--accent2);font-weight:500}
+
+/* ── INPUTS ── */
+input[type="text"],textarea{width:100%;background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);color:var(--text);font-family:'Inter',sans-serif;font-size:0.95rem;padding:0.7rem 1rem;outline:none;transition:border-color 0.15s;-webkit-appearance:none}
+input:focus,textarea:focus{border-color:var(--accent)}
+input::placeholder{color:var(--muted2)}
+
+/* ── RANGE ── */
+.range-wrap{margin:1.25rem 0}
+.range-labels{display:flex;justify-content:space-between;font-size:0.8rem;color:var(--muted);margin-bottom:0.4rem}
+.range-value{text-align:center;font-size:1.4rem;font-family:'Syne',sans-serif;font-weight:700;color:var(--accent2);margin-bottom:0.4rem}
+input[type="range"]{-webkit-appearance:none;appearance:none;height:6px;border-radius:100px;background:var(--surface2);outline:none;padding:0;border:none;cursor:pointer;width:100%}
+input[type="range"]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--accent);cursor:pointer;border:3px solid var(--bg);box-shadow:0 0 0 1px var(--accent)}
+
+/* ── CHIPS ── */
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:0.6rem}
+.chip{padding:5px 13px;border-radius:100px;border:1px solid var(--border);background:var(--surface2);font-size:0.82rem;cursor:pointer;color:var(--text);transition:all 0.15s;user-select:none}
+.chip:hover{border-color:rgba(124,92,252,0.4)}
+.chip.on{border-color:var(--accent);background:rgba(124,92,252,0.12);color:var(--accent2)}
+.form-group{margin-bottom:1.1rem}
+.form-label{display:block;font-size:0.83rem;font-weight:500;color:var(--muted);margin-bottom:5px}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:0.7rem 1.5rem;border-radius:var(--r);font-family:'Inter',sans-serif;font-size:0.95rem;font-weight:600;cursor:pointer;transition:opacity 0.15s,transform 0.1s;border:none;text-decoration:none}
+.btn:active{transform:scale(0.98)}
+.btn-primary{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}
+.btn-primary:hover{opacity:0.88}
+.btn-ghost{background:transparent;border:1px solid var(--border2);color:var(--muted)}
+.btn-ghost:hover{border-color:var(--accent);color:var(--text)}
+.btn-full{width:100%}
+.btn-row{display:flex;gap:10px;margin-top:1.25rem;flex-wrap:wrap}
+.btn:disabled{opacity:0.38;cursor:not-allowed}
+
+/* ── LOADING ── */
+.loading-overlay{display:none;text-align:center;padding:3rem 1rem}
+.loading-overlay.active{display:block}
+.spinner{width:44px;height:44px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 1.25rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{font-family:'Syne',sans-serif;font-size:1.05rem;color:var(--text);margin-bottom:0.4rem}
+.loading-sub{color:var(--muted);font-size:0.87rem}
+
+/* ── 3 QUEST CARDS ── */
+.quest-options{display:flex;flex-direction:column;gap:14px;margin-bottom:1.5rem}
+.quest-option{background:var(--surface2);border:1.5px solid var(--border);border-radius:var(--r-lg);padding:1.4rem;cursor:pointer;transition:all 0.2s;position:relative;overflow:hidden}
+.quest-option::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,92,252,0.06),rgba(192,132,252,0.03));opacity:0;transition:opacity 0.2s}
+.quest-option:hover{border-color:rgba(124,92,252,0.35)}
+.quest-option:hover::before{opacity:1}
+.quest-option.selected{border-color:var(--accent);background:rgba(124,92,252,0.08)}
+.quest-option.selected::before{opacity:1}
+.qo-header{display:flex;align-items:flex-start;gap:12px;margin-bottom:0.7rem}
+.qo-diff{flex-shrink:0;padding:3px 10px;border-radius:100px;font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-top:2px}
+.diff-easy{background:rgba(74,222,128,0.13);color:var(--green);border:1px solid rgba(74,222,128,0.3)}
+.diff-medium{background:rgba(245,166,35,0.13);color:var(--gold);border:1px solid rgba(245,166,35,0.3)}
+.diff-hard{background:rgba(252,92,125,0.13);color:var(--danger);border:1px solid rgba(252,92,125,0.3)}
+.qo-title{font-family:'Syne',sans-serif;font-weight:700;font-size:1.05rem;color:var(--text);line-height:1.25}
+.qo-tagline{font-size:0.87rem;color:var(--muted);margin-bottom:0.85rem;line-height:1.5}
+.qo-meta{display:flex;gap:14px;flex-wrap:wrap}
+.qo-meta-item{font-size:0.78rem;color:var(--muted2);display:flex;align-items:center;gap:4px}
+.qo-select-btn{position:absolute;top:1.1rem;right:1.1rem;width:26px;height:26px;border-radius:50%;border:2px solid var(--border2);background:transparent;display:flex;align-items:center;justify-content:center;transition:all 0.15s;flex-shrink:0}
+.quest-option.selected .qo-select-btn{background:var(--accent);border-color:var(--accent)}
+.qo-checkmark{color:#fff;font-size:0.7rem;font-weight:700;display:none}
+.quest-option.selected .qo-checkmark{display:block}
+
+/* ── FULL QUEST RESULT ── */
+.quest-banner{background:linear-gradient(135deg,rgba(124,92,252,0.18),rgba(192,132,252,0.09));border:1px solid rgba(124,92,252,0.3);border-radius:var(--r-lg);padding:1.75rem;margin-bottom:1.25rem;text-align:center}
+.quest-title-big{font-family:'Syne',sans-serif;font-weight:800;font-size:clamp(1.5rem,4vw,2.2rem);line-height:1.15;margin-bottom:0.6rem;background:linear-gradient(135deg,#fff,var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.quest-tagline-big{color:var(--muted);font-size:0.95rem;max-width:480px;margin:0 auto}
+.quest-meta-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:8px;margin:1.1rem 0}
+.meta-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--r);padding:0.75rem;text-align:center}
+.meta-val{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;color:var(--text)}
+.meta-key{font-size:0.72rem;color:var(--muted);margin-top:2px}
+.section-block{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:1.35rem;margin-bottom:0.9rem}
+.section-block h3{font-family:'Syne',sans-serif;font-weight:700;font-size:0.95rem;margin-bottom:0.85rem;display:flex;align-items:center;gap:8px;color:var(--text)}
+.s-icon{width:26px;height:26px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0}
+.ip{background:rgba(124,92,252,0.15)}.ig{background:rgba(245,166,35,0.15)}.is{background:rgba(74,222,128,0.15)}.id{background:rgba(252,92,125,0.15)}
+.step-list{list-style:none;counter-reset:steps}
+.step-list li{counter-increment:steps;display:flex;gap:12px;padding:0.55rem 0;border-bottom:1px solid var(--border);font-size:0.9rem;color:var(--text);align-items:flex-start}
+.step-list li:last-child{border-bottom:none;padding-bottom:0}
+.step-list li::before{content:counter(steps);min-width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:0.7rem;font-weight:700;display:flex;align-items:center;justify-content:center;margin-top:1px;flex-shrink:0}
+.bullet-list{list-style:none}
+.bullet-list li{display:flex;gap:9px;padding:0.4rem 0;font-size:0.9rem;color:var(--text);align-items:flex-start}
+.bullet-list li::before{content:'◆';color:var(--accent2);font-size:0.55rem;margin-top:7px;flex-shrink:0}
+.tip-box{background:rgba(245,166,35,0.07);border:1px solid rgba(245,166,35,0.18);border-radius:var(--r);padding:0.9rem;font-size:0.88rem;color:var(--text);margin-top:0.6rem}
+.tip-box strong{color:var(--gold)}
+.recap-pills{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:1.25rem}
+.recap-pill{padding:3px 11px;border-radius:100px;background:var(--surface2);border:1px solid var(--border);font-size:0.78rem;color:var(--muted)}
+.recap-pill span{color:var(--text);font-weight:500}
+.result-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:1.25rem}
+.error-box{background:rgba(252,92,125,0.08);border:1px solid rgba(252,92,125,0.25);border-radius:var(--r);padding:0.9rem 1.1rem;color:var(--danger);font-size:0.87rem;display:none;margin-bottom:1rem}
+.error-box.active{display:block}
+
+/* ── FOOTER ── */
+footer{text-align:center;padding:2.5rem 0 1.75rem;color:var(--muted);font-size:0.82rem;position:relative;z-index:1;border-top:1px solid var(--border);margin-top:2rem}
+.footer-inner{max-width:860px;margin:0 auto;padding:0 1.5rem}
+
+@media(max-width:560px){
+  .card{padding:1.25rem}
+  .tile-grid{grid-template-columns:repeat(2,1fr)}
+  .btn-row{flex-direction:column}
 }
 </style>
 </head>
 <body>
 
-<div id="auth-overlay">
-  <div class="auth-box">
-    <h2 style="font-family:'Syne'; color:var(--text); margin-bottom:1.5rem;" id="auth-title">Sign In to Side Quest</h2>
-    <input type="email" id="auth-email" class="auth-input" placeholder="Email Address">
-    <input type="password" id="auth-password" class="auth-input" placeholder="Password">
-    <button id="auth-submit-btn" class="primary-btn" style="width:100%; margin-top:1rem;">Sign In</button>
-    <p style="color:var(--muted); font-size:0.85rem; margin-top:1rem; cursor:pointer;" id="auth-toggle">Don't have an account? Sign Up</p>
+<!-- ── NAV ── -->
+<nav>
+  <div class="nav-inner">
+    <div class="logo" onclick="resetApp()">
+      <div class="logo-icon">⚔️</div>
+      Side Quest
+    </div>
+    <div class="nav-right">
+      <a href="https://buy.stripe.com/test_bJe4gz7oJgdw5ri4lUbsc01" target="_blank" class="coffee-btn">
+        ☕ Buy me a coffee (AUD)
+      </a>
+    </div>
   </div>
+</nav>
+
+<!-- ── MAIN CONTAINER ── -->
+<div class="container">
+
+  <!-- HERO -->
+  <div class="hero">
+    <p class="hero-eyebrow">Your next adventure awaits</p>
+    <h1>Stop scrolling.<br>Start questing.</h1>
+    <p>Answer a few questions, drop your location, and get 3 handpicked missions — fully planned, start to finish.</p>
+    <div class="progress-wrap">
+      <div class="progress-step active" id="prog-1"></div>
+      <div class="progress-step" id="prog-2"></div>
+      <div class="progress-step" id="prog-3"></div>
+      <div class="progress-step" id="prog-4"></div>
+    </div>
+  </div>
+
+  <!-- STEP 1: Quest type + occasion filter -->
+  <div class="step active" id="step-1">
+    <div class="card">
+      <div class="section-label">Step 1 of 4</div>
+      <h2>What kind of quest calls to you?</h2>
+      <p class="subtitle">Pick the vibe that matches your energy today.</p>
+
+      <div class="form-group">
+        <div class="form-label">Filter by occasion</div>
+        <div class="occasion-scroll">
+          <div class="occasion-chip" data-val="" onclick="selectOccasion(this)">✨ Any</div>
+          <div class="occasion-chip" data-val="first date" onclick="selectOccasion(this)">💘 First date</div>
+          <div class="occasion-chip" data-val="friend group hangout" onclick="selectOccasion(this)">👯 Friend hangout</div>
+          <div class="occasion-chip" data-val="solo self-care" onclick="selectOccasion(this)">🧘 Solo self-care</div>
+          <div class="occasion-chip" data-val="dad day out" onclick="selectOccasion(this)">👨 Dad day out</div>
+          <div class="occasion-chip" data-val="family with young kids" onclick="selectOccasion(this)">👨‍👩‍👧 Family trip</div>
+          <div class="occasion-chip" data-val="date night" onclick="selectOccasion(this)">🌙 Date night</div>
+          <div class="occasion-chip" data-val="birthday adventure" onclick="selectOccasion(this)">🎂 Birthday</div>
+          <div class="occasion-chip" data-val="stag or hen do" onclick="selectOccasion(this)">🥂 Stag/Hen do</div>
+          <div class="occasion-chip" data-val="spontaneous solo adventure" onclick="selectOccasion(this)">⚡ Spontaneous</div>
+          <div class="occasion-chip" data-val="work team building" onclick="selectOccasion(this)">💼 Team building</div>
+        </div>
+      </div>
+
+      <div class="tile-grid">
+        <div class="tile" data-val="exploration" onclick="selectTile(this,'questType')"><span class="tile-icon">🗺️</span><div class="tile-label">Exploration</div><div class="tile-sub">Discover hidden places</div></div>
+        <div class="tile" data-val="food & drink" onclick="selectTile(this,'questType')"><span class="tile-icon">🍜</span><div class="tile-label">Food & Drink</div><div class="tile-sub">Eat something new</div></div>
+        <div class="tile" data-val="social" onclick="selectTile(this,'questType')"><span class="tile-icon">🤝</span><div class="tile-label">Social</div><div class="tile-sub">Meet people, do things</div></div>
+        <div class="tile" data-val="creative" onclick="selectTile(this,'questType')"><span class="tile-icon">🎨</span><div class="tile-label">Creative</div><div class="tile-sub">Make or learn something</div></div>
+        <div class="tile" data-val="physical challenge" onclick="selectTile(this,'questType')"><span class="tile-icon">🏃</span><div class="tile-label">Physical</div><div class="tile-sub">Get moving outside</div></div>
+        <div class="tile" data-val="cultural & historical" onclick="selectTile(this,'questType')"><span class="tile-icon">🏛️</span><div class="tile-label">Cultural</div><div class="tile-sub">History & heritage</div></div>
+        <div class="tile" data-val="nature & wildlife" onclick="selectTile(this,'questType')"><span class="tile-icon">🌿</span><div class="tile-label">Nature</div><div class="tile-sub">Green spaces & wildlife</div></div>
+        <div class="tile" data-val="weird & unusual" onclick="selectTile(this,'questType')"><span class="tile-icon">🔮</span><div class="tile-label">Weird & Unusual</div><div class="tile-sub">Embrace the strange</div></div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-primary btn-full" onclick="goStep(2)" id="btn-step1" disabled>Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 2: Preferences -->
+  <div class="step" id="step-2">
+    <div class="card">
+      <div class="section-label">Step 2 of 4</div>
+      <h2>Tell us about you</h2>
+      <p class="subtitle">We'll personalise all three quests to fit your style.</p>
+
+      <div class="form-group">
+        <div class="form-label">Who's coming?</div>
+        <div class="tile-grid" style="grid-template-columns:repeat(auto-fit,minmax(110px,1fr))">
+          <div class="tile" data-val="solo" onclick="selectTile(this,'groupSize')"><span class="tile-icon">🧍</span><div class="tile-label">Solo</div></div>
+          <div class="tile" data-val="a duo" onclick="selectTile(this,'groupSize')"><span class="tile-icon">👫</span><div class="tile-label">Duo</div></div>
+          <div class="tile" data-val="a small group of friends" onclick="selectTile(this,'groupSize')"><span class="tile-icon">👥</span><div class="tile-label">Small group</div></div>
+          <div class="tile" data-val="a family with kids" onclick="selectTile(this,'groupSize')"><span class="tile-icon">👨‍👩‍👧</span><div class="tile-label">Family</div></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">Time available</div>
+        <div class="tile-grid" style="grid-template-columns:repeat(auto-fit,minmax(110px,1fr))">
+          <div class="tile" data-val="1-2 hours" onclick="selectTile(this,'timeAvail')"><span class="tile-icon">⚡</span><div class="tile-label">1–2 hrs</div></div>
+          <div class="tile" data-val="half a day" onclick="selectTile(this,'timeAvail')"><span class="tile-icon">🌤️</span><div class="tile-label">Half day</div></div>
+          <div class="tile" data-val="a full day" onclick="selectTile(this,'timeAvail')"><span class="tile-icon">☀️</span><div class="tile-label">Full day</div></div>
+          <div class="tile" data-val="a weekend" onclick="selectTile(this,'timeAvail')"><span class="tile-icon">🗓️</span><div class="tile-label">Weekend</div></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">Budget</div>
+        <div class="chips" id="chips-budget">
+          <div class="chip" data-val="free / no spend" onclick="toggleChip(this,'budget')">💸 Free</div>
+          <div class="chip" data-val="low budget (under $20)" onclick="toggleChip(this,'budget')">🪙 Low budget</div>
+          <div class="chip" data-val="mid range ($20–$60)" onclick="toggleChip(this,'budget')">💳 Mid range</div>
+          <div class="chip" data-val="splash out (no limit)" onclick="toggleChip(this,'budget')">🥂 Splash out</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">Anything extra? (optional)</div>
+        <textarea rows="2" id="extraPrefs" placeholder="e.g. dog-friendly, no alcohol, love vintage shops, shy people welcome..."></textarea>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goStep(1)">← Back</button>
+        <button class="btn btn-primary" style="flex:1" onclick="goStep(3)" id="btn-step2" disabled>Next →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 3: Location -->
+  <div class="step" id="step-3">
+    <div class="card">
+      <div class="section-label">Step 3 of 4</div>
+      <h2>Where are you starting from?</h2>
+      <p class="subtitle">Enter your suburb, city, or area. We'll plan everything around it.</p>
+
+      <div class="form-group">
+        <div class="form-label">Your location</div>
+        <input type="text" id="location" placeholder="e.g. Melbourne CBD, Sydney, or Brisbane..." oninput="checkStep3()">
+      </div>
+
+      <div class="range-wrap">
+        <div class="form-label">How far are you willing to travel?</div>
+        <div class="range-value" id="range-display">1 hour away</div>
+        <div class="range-labels"><span>15 mins</span><span>4+ hours</span></div>
+        <input type="range" min="1" max="10" value="4" step="1" id="travelRange" oninput="updateRange(this.value)">
+      </div>
+
+      <div class="form-group">
+        <div class="form-label">How are you getting there?</div>
+        <div class="chips">
+          <div class="chip on" data-val="walking" onclick="toggleChip(this,'transport')">🚶 Walking</div>
+          <div class="chip" data-val="cycling" onclick="toggleChip(this,'transport')">🚲 Cycling</div>
+          <div class="chip" data-val="public transport" onclick="toggleChip(this,'transport')">🚌 Public transport</div>
+          <div class="chip" data-val="car" onclick="toggleChip(this,'transport')">🚗 Car</div>
+        </div>
+      </div>
+
+      <div class="btn-row">
+        <button class="btn btn-ghost" onclick="goStep(2)">← Back</button>
+        <button class="btn btn-primary" style="flex:1" onclick="goStep(4)" id="btn-step3" disabled>Generate 3 quests ✨</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 4: Choose from 3 options -->
+  <div class="step" id="step-4">
+    <div class="loading-overlay active" id="loading">
+      <div class="spinner"></div>
+      <div class="loading-text" id="loading-msg">Scouting your quests...</div>
+      <div class="loading-sub">Plotting routes, hunting secrets, writing three missions</div>
+    </div>
+
+    <div id="pick-content" style="display:none">
+      <div class="card">
+        <div class="section-label">Step 4 of 4 — Pick your quest</div>
+        <h2>Three quests, one choice.</h2>
+        <p class="subtitle">Each one is fully planned. Tap one to see all the details.</p>
+        <div class="quest-options" id="quest-options-list"></div>
+        <div class="error-box" id="error-box-4"></div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="goStep(3)">← Back</button>
+          <button class="btn btn-primary" style="flex:1" onclick="showSelectedQuest()" id="btn-pick" disabled>Let's go on this quest →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STEP 5: Full quest detail -->
+  <div class="step" id="step-5">
+    <div id="result-content">
+      <div class="recap-pills" id="recap-pills"></div>
+      <div id="quest-output"></div>
+      <div class="result-actions">
+        <button class="btn btn-ghost" onclick="goStep(4)">← Pick a different quest</button>
+        <button class="btn btn-ghost" onclick="regenerateQuests()">🔄 Generate 3 new quests</button>
+        <button class="btn btn-ghost" onclick="resetApp()">Start over</button>
+      </div>
+    </div>
+  </div>
+
 </div>
 
-<div class="container" id="main-app" style="display:none;">
-  <div class="top-bar">
-    <a href="https://buy.stripe.com/test_bJe4gz7oJgdw5ri4lUbsc01" target="_blank" class="coffee-btn">
-      ☕ Buy me a coffee (AUD)
-    </a>
-    <button id="logout-btn" style="background:transparent; border:1px solid var(--border); color:var(--text); padding:0.5rem 1rem; border-radius:8px; cursor:pointer;">Log Out</button>
+<footer>
+  <div class="footer-inner">
+    Made with ❤️ for the restless &nbsp;⚔️&nbsp; Side Quest
   </div>
+</footer>
 
-  </div>
+<script>
+// ── STATE ──
+const state = {
+  questType:null, occasion:'', groupSize:null, timeAvail:null, budget:null,
+  transport:['walking'], extraPrefs:'', location:'', travelTime:4,
+  selectedQuestIdx:null, generatedQuests:[]
+};
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+// ── QUIZ LOGIC ──
+function selectTile(el, key) {
+  const grid = el.closest('.tile-grid');
+  grid.querySelectorAll('.tile').forEach(t => t.classList.remove('selected'));
+  el.classList.add('selected');
+  state[key] = el.dataset.val;
+  validateSteps();
+}
 
-  // TODO: Replace with your actual Firebase project config snippet
-  const firebaseConfig = {
-    apiKey: "YOUR_FIREBASE_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
+function selectOccasion(el) {
+  document.querySelectorAll('.occasion-chip').forEach(c => c.classList.remove('on'));
+  el.classList.add('on');
+  state.occasion = el.dataset.val;
+}
 
-  const app = initializeApp(firebaseConfig);
-  const auth = getAuth(app);
+function toggleChip(el, key) {
+  if (key === 'budget') {
+    document.querySelectorAll('#chips-budget .chip').forEach(c => c.classList.remove('on'));
+    el.classList.add('on');
+    state[key] = el.dataset.val;
+  } else {
+    el.classList.toggle('on');
+    const chips = el.closest('.chips').querySelectorAll('.chip.on');
+    state[key] = Array.from(chips).map(c => c.dataset.val);
+  }
+  validateSteps();
+}
 
-  // Authentication UI Interactions
-  let isSignUpMode = false;
-  const authOverlay = document.getElementById('auth-overlay');
-  const mainApp = document.getElementById('main-app');
-  const authTitle = document.getElementById('auth-title');
-  const authSubmitBtn = document.getElementById('auth-submit-btn');
-  const authToggle = document.getElementById('auth-toggle');
+function validateSteps() {
+  document.getElementById('btn-step1').disabled = !state.questType;
+  document.getElementById('btn-step2').disabled = !(state.groupSize && state.timeAvail && state.budget);
+  document.getElementById('btn-step3').disabled = !state.location.trim();
+}
 
-  authToggle.addEventListener('click', () => {
-    isSignUpMode = !isSignUpMode;
-    authTitle.innerText = isSignUpMode ? "Create an Account" : "Sign In to Side Quest";
-    authSubmitBtn.innerText = isSignUpMode ? "Sign Up" : "Sign In";
-    authToggle.innerText = isSignUpMode ? "Already have an account? Sign In" : "Don't have an account? Sign Up";
-  });
+function checkStep3() {
+  state.location = document.getElementById('location').value;
+  validateSteps();
+}
 
-  authSubmitBtn.addEventListener('click', async () => {
-    const email = document.getElementById('auth-email').value;
-    const password = document.getElementById('auth-password').value;
-    try {
-      if (isSignUpMode) {
-        await createUserWithEmailAndPassword(auth, email, password);
-      } else {
-        await signInWithEmailAndPassword(auth, email, password);
-      }
-    } catch (err) {
-      alert(err.message);
-    }
-  });
+const travelLabels = ['15 mins','30 mins','45 mins','1 hour','1.5 hours','2 hours','2.5 hours','3 hours','3.5 hours','4+ hours'];
+function updateRange(v) {
+  state.travelTime = parseInt(v);
+  document.getElementById('range-display').textContent = travelLabels[parseInt(v)-1] + ' away';
+}
 
-  document.getElementById('logout-btn').addEventListener('click', () => signOut(auth));
+let currentStep = 1;
+function goStep(n) {
+  if (n === 3) state.extraPrefs = document.getElementById('extraPrefs')?.value || '';
+  document.getElementById('step-' + currentStep).classList.remove('active');
+  document.getElementById('step-' + n).classList.add('active');
+  for (let i = 1; i <= 4; i++) {
+    const p = document.getElementById('prog-' + i);
+    if (!p) continue;
+    if (i < n) { p.classList.add('done'); p.classList.remove('active'); }
+    else if (i === n) { p.classList.add('active'); p.classList.remove('done'); }
+    else { p.classList.remove('active','done'); }
+  }
+  currentStep = n;
+  window.scrollTo({top:0,behavior:'smooth'});
+  if (n === 4) generateThreeQuests();
+}
 
-  // Monitor Auth State Changes
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      authOverlay.style.display = 'none';
-      mainApp.style.display = 'block';
-    } else {
-      authOverlay.style.display = 'flex';
-      mainApp.style.display = 'none';
-    }
-  });
+function resetApp() {
+  Object.assign(state, {questType:null,occasion:'',groupSize:null,timeAvail:null,budget:null,transport:['walking'],extraPrefs:'',location:'',travelTime:4,selectedQuestIdx:null,generatedQuests:[]});
+  document.querySelectorAll('.tile').forEach(t => t.classList.remove('selected'));
+  document.querySelectorAll('.chip').forEach(c => { c.classList.remove('on'); if (c.dataset.val==='walking') c.classList.add('on'); });
+  document.querySelectorAll('.occasion-chip').forEach(c => c.classList.remove('on'));
+  if (document.getElementById('location')) document.getElementById('location').value = '';
+  if (document.getElementById('travelRange')) document.getElementById('travelRange').value = 4;
+  document.getElementById('range-display').textContent = '1 hour away';
+  ['btn-step1','btn-step2','btn-step3'].forEach(id => document.getElementById(id).disabled = true);
+  document.getElementById('pick-content').style.display = 'none';
+  document.getElementById('loading').classList.add('active');
+  document.getElementById('quest-output').innerHTML = '';
+  
+  for (let i = 1; i <= 5; i++) document.getElementById('step-'+i)?.classList.remove('active');
+  document.getElementById('step-1').classList.add('active');
+  currentStep = 1;
+  for (let i = 1; i <= 4; i++) {
+    const p = document.getElementById('prog-'+i);
+    if (p) { p.classList.remove('done','active'); if (i===1) p.classList.add('active'); }
+  }
+  window.scrollTo({top:0,behavior:'smooth'});
+}
 
-  // FIXED CLAUDE FETCH CALL USING PROXY (Bypasses CORS error on Free Domains)
-  async function generateQuestAPI(prompt) {
-    const ANTHROPIC_API_KEY = 'YOUR_NEW_ANTHROPIC_KEY'; // Replace with a secure key
+function regenerateQuests() {
+  document.getElementById('step-5').classList.remove('active');
+  document.getElementById('step-4').classList.add('active');
+  currentStep = 4;
+  document.getElementById('pick-content').style.display = 'none';
+  document.getElementById('loading').classList.add('active');
+  generateThreeQuests();
+}
+
+// ── AI GENERATION (CORS PROXY INCLUDED) ──
+const loadingMsgs = ['Scouting your quests...','Plotting three routes...','Hunting local secrets...','Crafting your mission briefs...'];
+
+async function generateThreeQuests() {
+  document.getElementById('loading').classList.add('active');
+  document.getElementById('pick-content').style.display = 'none';
+  document.getElementById('error-box-4').classList.remove('active');
+  document.getElementById('btn-pick').disabled = true;
+  state.selectedQuestIdx = null;
+
+  let mi = 0;
+  const msgEl = document.getElementById('loading-msg');
+  const interval = setInterval(() => { mi = (mi+1)%loadingMsgs.length; msgEl.textContent = loadingMsgs[mi]; }, 1800);
+
+  const transport = Array.isArray(state.transport) ? state.transport.join(', ') : state.transport;
+  const travelLabel = travelLabels[state.travelTime-1];
+  const occasionLine = state.occasion ? `Occasion: ${state.occasion}` : 'No specific occasion';
+
+  const prompt = `You are a real-world adventure planner. Generate THREE distinct, creative, and genuinely exciting side quests for this person. Each quest must be different in difficulty and vibe.
+
+User details:
+- Quest type they want: ${state.questType}
+- Occasion: ${occasionLine}
+- Group: ${state.groupSize}
+- Time available: ${state.timeAvail}
+- Budget: ${state.budget}
+- Starting location: ${state.location}
+- Max travel time: ${travelLabel}
+- Transport: ${transport || 'walking'}
+- Extra preferences: ${state.extraPrefs || 'none'}
+
+Respond with ONLY a valid JSON array of exactly 3 quest objects. No markdown, no preamble, no code fences. Each object must have exactly these fields:
+
+{
+  "title": "Short punchy quest name (5-8 words)",
+  "tagline": "One sentence that makes them want to go RIGHT NOW",
+  "difficulty": "Easy|Medium|Hard",
+  "estimatedTime": "e.g. 2-3 hours",
+  "estimatedCost": "e.g. Free or $5-15",
+  "missionBrief": "2-3 sentences setting the scene and explaining WHY this quest is worth doing. Be specific to their location.",
+  "steps": ["Step 1: specific action", "Step 2: ...", "Step 3: ...", "Step 4: ...", "Step 5: ..."],
+  "whatToBring": ["item 1", "item 2", "item 3"],
+  "localTip": "One genuinely useful insider tip for this type of adventure in their area",
+  "bonusChallenge": "An optional bonus challenge to level up the quest",
+  "questReward": "What they'll have gained by the end — keep it real not cheesy"
+}
+
+Make one quest Easy, one Medium, one Hard. Make each distinctly different — not just difficulty variants of the same idea. Be creative and specific to ${state.location}.`;
+
+  try {
+    const ANTHROPIC_API_KEY = 'YOUR_API_KEY_HERE'; 
     const targetUrl = 'https://api.anthropic.com/v1/messages';
     
-    // Prefixing with corsproxy.io to allow client-side connection
+    // Using CORS proxy to allow direct client-side fetch from browsers/GitHub Pages
     const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`;
 
-    const response = await fetch(proxyUrl, {
+    const resp = await fetch(proxyUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -130,19 +547,128 @@
         'anthropic-dangerously-allow-browser': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022',
+        model: 'claude-3-5-sonnet-20241022', 
         max_tokens: 1500,
         messages: [{ role: 'user', content: prompt }]
       })
     });
 
-    if (!response.ok) {
-      throw new Error(`API Error: ${response.statusText}`);
-    }
-    return await response.json();
+    clearInterval(interval);
+    if (!resp.ok) throw new Error('API error '+resp.status);
+    
+    const data = await resp.json();
+    const raw = data.content.map(b => b.text||'').join('');
+    const clean = raw.replace(/```json|```/g,'').trim();
+    const quests = JSON.parse(clean);
+    state.generatedQuests = quests;
+    renderQuestOptions(quests);
+  } catch(err) {
+    clearInterval(interval);
+    document.getElementById('loading').classList.remove('active');
+    document.getElementById('pick-content').style.display = 'block';
+    const eb = document.getElementById('error-box-4');
+    eb.textContent = 'Quest generation failed. Check your connection and try again. ('+err.message+')';
+    eb.classList.add('active');
   }
+}
 
-  // Bind your original script handling submission to call generateQuestAPI(prompt)
+function renderQuestOptions(quests) {
+  document.getElementById('loading').classList.remove('active');
+  const list = document.getElementById('quest-options-list');
+  list.innerHTML = quests.map((q,i) => {
+    return `
+    <div class="quest-option" onclick="pickQuest(${i},this)">
+      <div class="qo-select-btn"><span class="qo-checkmark">✓</span></div>
+      <div class="qo-header">
+        <span class="qo-diff diff-${q.difficulty.toLowerCase()}">${q.difficulty}</span>
+        <div>
+          <div class="qo-title">${escHtml(q.title)}</div>
+        </div>
+      </div>
+      <div class="qo-tagline">${escHtml(q.tagline)}</div>
+      <div class="qo-meta">
+        <span class="qo-meta-item">⏱️ ${escHtml(q.estimatedTime)}</span>
+        <span class="qo-meta-item">💰 ${escHtml(q.estimatedCost)}</span>
+      </div>
+    </div>`;
+  }).join('');
+  document.getElementById('pick-content').style.display = 'block';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function pickQuest(idx, el) {
+  document.querySelectorAll('.quest-option').forEach(o => o.classList.remove('selected'));
+  el.classList.add('selected');
+  state.selectedQuestIdx = idx;
+  document.getElementById('btn-pick').disabled = false;
+}
+
+function showSelectedQuest() {
+  if (state.selectedQuestIdx === null) return;
+  const q = state.generatedQuests[state.selectedQuestIdx];
+  renderFullQuest(q);
+}
+
+function renderFullQuest(q) {
+  const pills = document.getElementById('recap-pills');
+  const travelLabel = travelLabels[state.travelTime-1];
+  pills.innerHTML = `
+    <div class="recap-pill">📍 <span>${state.location}</span></div>
+    <div class="recap-pill">🗺️ <span>${state.questType}</span></div>
+    ${state.occasion ? `<div class="recap-pill">✨ <span>${state.occasion}</span></div>` : ''}
+    <div class="recap-pill">⏱️ <span>${state.timeAvail}</span></div>
+    <div class="recap-pill">👥 <span>${state.groupSize}</span></div>
+    <div class="recap-pill">💰 <span>${state.budget}</span></div>
+    <div class="recap-pill">🕐 <span>Within ${travelLabel}</span></div>`;
+
+  const diffClass = {Easy:'diff-easy',Medium:'diff-medium',Hard:'diff-hard'}[q.difficulty]||'diff-medium';
+  const stepsHtml = (q.steps||[]).map(s => `<li>${escHtml(s)}</li>`).join('');
+  const bringHtml = (q.whatToBring||[]).map(b => `<li>${escHtml(b)}</li>`).join('');
+
+  document.getElementById('quest-output').innerHTML = `
+    <div class="quest-banner">
+      <div class="difficulty-badge ${diffClass}" style="display:inline-block;padding:3px 12px;border-radius:100px;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.85rem">${q.difficulty} quest</div>
+      <div class="quest-title-big">${escHtml(q.title)}</div>
+      <div class="quest-tagline-big">${escHtml(q.tagline)}</div>
+    </div>
+    <div class="quest-meta-grid">
+      <div class="meta-card"><div class="meta-val">⏱️ ${escHtml(q.estimatedTime)}</div><div class="meta-key">Est. time</div></div>
+      <div class="meta-card"><div class="meta-val">💰 ${escHtml(q.estimatedCost)}</div><div class="meta-key">Est. cost</div></div>
+      <div class="meta-card"><div class="meta-val">🕐 ${escHtml(travelLabel)}</div><div class="meta-key">Max travel</div></div>
+      <div class="meta-card"><div class="meta-val">${{Easy:'🌱',Medium:'⚡',Hard:'🔥'}[q.difficulty]||'⚡'}</div><div class="meta-key">${escHtml(q.difficulty)}</div></div>
+    </div>
+    <div class="section-block">
+      <h3><span class="s-icon ip">📜</span> Mission brief</h3>
+      <p style="color:var(--text);font-size:0.9rem;line-height:1.7">${escHtml(q.missionBrief)}</p>
+    </div>
+    <div class="section-block">
+      <h3><span class="s-icon ip">⚔️</span> Your quest steps</h3>
+      <ol class="step-list">${stepsHtml}</ol>
+    </div>
+    <div class="section-block">
+      <h3><span class="s-icon ig">🎒</span> What to bring</h3>
+      <ul class="bullet-list">${bringHtml}</ul>
+    </div>
+    <div class="section-block">
+      <h3><span class="s-icon is">💡</span> Local tip</h3>
+      <p style="color:var(--text);font-size:0.9rem">${escHtml(q.localTip)}</p>
+    </div>
+    <div class="section-block">
+      <h3><span class="s-icon id">⭐</span> Bonus challenge</h3>
+      <p style="color:var(--text);font-size:0.9rem">${escHtml(q.bonusChallenge)}</p>
+      <div class="tip-box" style="margin-top:0.75rem"><strong>🏆 Quest reward:</strong> ${escHtml(q.questReward)}</div>
+    </div>`;
+
+  document.getElementById('step-4').classList.remove('active');
+  document.getElementById('step-5').classList.add('active');
+  currentStep = 5;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function escHtml(s) {
+  if (!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 </script>
 </body>
 </html>
