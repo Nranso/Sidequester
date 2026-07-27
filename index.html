@@ -220,7 +220,7 @@ footer{text-align:center;padding:2.5rem 0 1.75rem;color:var(--muted);font-size:0
       <div class="form-group">
         <div class="form-label">Filter by occasion</div>
         <div class="occasion-scroll">
-          <div class="occasion-chip" data-val="" onclick="selectOccasion(this)">✨ Any</div>
+          <div class="occasion-chip on" data-val="" onclick="selectOccasion(this)">✨ Any</div>
           <div class="occasion-chip" data-val="first date" onclick="selectOccasion(this)">💘 First date</div>
           <div class="occasion-chip" data-val="friend group hangout" onclick="selectOccasion(this)">👯 Friend hangout</div>
           <div class="occasion-chip" data-val="solo self-care" onclick="selectOccasion(this)">🧘 Solo self-care</div>
@@ -412,6 +412,11 @@ function toggleChip(el, key) {
     el.classList.toggle('on');
     const chips = el.closest('.chips').querySelectorAll('.chip.on');
     state[key] = Array.from(chips).map(c => c.dataset.val);
+    if (state[key].length === 0) {
+      // don't allow zero transport modes selected - fall back to walking
+      el.classList.add('on');
+      state[key] = ['walking'];
+    }
   }
   validateSteps();
 }
@@ -454,15 +459,16 @@ function resetApp() {
   Object.assign(state, {questType:null,occasion:'',groupSize:null,timeAvail:null,budget:null,transport:['walking'],extraPrefs:'',location:'',travelTime:4,selectedQuestIdx:null,generatedQuests:[]});
   document.querySelectorAll('.tile').forEach(t => t.classList.remove('selected'));
   document.querySelectorAll('.chip').forEach(c => { c.classList.remove('on'); if (c.dataset.val==='walking') c.classList.add('on'); });
-  document.querySelectorAll('.occasion-chip').forEach(c => c.classList.remove('on'));
+  document.querySelectorAll('.occasion-chip').forEach(c => { c.classList.remove('on'); if (c.dataset.val==='') c.classList.add('on'); });
   if (document.getElementById('location')) document.getElementById('location').value = '';
+  if (document.getElementById('extraPrefs')) document.getElementById('extraPrefs').value = '';
   if (document.getElementById('travelRange')) document.getElementById('travelRange').value = 4;
   document.getElementById('range-display').textContent = '1 hour away';
   ['btn-step1','btn-step2','btn-step3'].forEach(id => document.getElementById(id).disabled = true);
   document.getElementById('pick-content').style.display = 'none';
   document.getElementById('loading').classList.add('active');
   document.getElementById('quest-output').innerHTML = '';
-  
+
   for (let i = 1; i <= 5; i++) document.getElementById('step-'+i)?.classList.remove('active');
   document.getElementById('step-1').classList.add('active');
   currentStep = 1;
@@ -482,7 +488,7 @@ function regenerateQuests() {
   generateThreeQuests();
 }
 
-// ── AI GENERATION (CORS PROXY INCLUDED) ──
+// ── AI GENERATION ──
 const loadingMsgs = ['Scouting your quests...','Plotting three routes...','Hunting local secrets...','Crafting your mission briefs...'];
 
 async function generateThreeQuests() {
@@ -532,13 +538,15 @@ Respond with ONLY a valid JSON array of exactly 3 quest objects. No markdown, no
 Make one quest Easy, one Medium, one Hard. Make each distinctly different — not just difficulty variants of the same idea. Be creative and specific to ${state.location}.`;
 
   try {
-    const ANTHROPIC_API_KEY = 'YOUR_API_KEY_HERE'; 
+    // NOTE: Calling the Anthropic API directly from the browser exposes your API key
+    // to anyone who views page source or inspects network requests. For a real deployment,
+    // proxy this request through your own backend (e.g. a small serverless function) that
+    // holds the key server-side. The corsproxy.io relay has been removed here since it added
+    // an unreliable third-party dependency on top of the key-exposure issue.
+    const ANTHROPIC_API_KEY = 'YOUR_API_KEY_HERE';
     const targetUrl = 'https://api.anthropic.com/v1/messages';
-    
-    // Using CORS proxy to allow direct client-side fetch from browsers/GitHub Pages
-    const proxyUrl = `https://corsproxy.io/?url=${encodeURIComponent(targetUrl)}`;
 
-    const resp = await fetch(proxyUrl, {
+    const resp = await fetch(targetUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -547,7 +555,7 @@ Make one quest Easy, one Medium, one Hard. Make each distinctly different — no
         'anthropic-dangerously-allow-browser': 'true'
       },
       body: JSON.stringify({
-        model: 'claude-3-5-sonnet-20241022', 
+        model: 'claude-sonnet-4-6',
         max_tokens: 1500,
         messages: [{ role: 'user', content: prompt }]
       })
@@ -555,7 +563,7 @@ Make one quest Easy, one Medium, one Hard. Make each distinctly different — no
 
     clearInterval(interval);
     if (!resp.ok) throw new Error('API error '+resp.status);
-    
+
     const data = await resp.json();
     const raw = data.content.map(b => b.text||'').join('');
     const clean = raw.replace(/```json|```/g,'').trim();
@@ -576,11 +584,12 @@ function renderQuestOptions(quests) {
   document.getElementById('loading').classList.remove('active');
   const list = document.getElementById('quest-options-list');
   list.innerHTML = quests.map((q,i) => {
+    const diffKey = (q.difficulty||'Medium').toLowerCase();
     return `
     <div class="quest-option" onclick="pickQuest(${i},this)">
       <div class="qo-select-btn"><span class="qo-checkmark">✓</span></div>
       <div class="qo-header">
-        <span class="qo-diff diff-${q.difficulty.toLowerCase()}">${q.difficulty}</span>
+        <span class="qo-diff diff-${diffKey}">${escHtml(q.difficulty)}</span>
         <div>
           <div class="qo-title">${escHtml(q.title)}</div>
         </div>
@@ -613,21 +622,23 @@ function renderFullQuest(q) {
   const pills = document.getElementById('recap-pills');
   const travelLabel = travelLabels[state.travelTime-1];
   pills.innerHTML = `
-    <div class="recap-pill">📍 <span>${state.location}</span></div>
-    <div class="recap-pill">🗺️ <span>${state.questType}</span></div>
-    ${state.occasion ? `<div class="recap-pill">✨ <span>${state.occasion}</span></div>` : ''}
-    <div class="recap-pill">⏱️ <span>${state.timeAvail}</span></div>
-    <div class="recap-pill">👥 <span>${state.groupSize}</span></div>
-    <div class="recap-pill">💰 <span>${state.budget}</span></div>
-    <div class="recap-pill">🕐 <span>Within ${travelLabel}</span></div>`;
+    <div class="recap-pill">📍 <span>${escHtml(state.location)}</span></div>
+    <div class="recap-pill">🗺️ <span>${escHtml(state.questType)}</span></div>
+    ${state.occasion ? `<div class="recap-pill">✨ <span>${escHtml(state.occasion)}</span></div>` : ''}
+    <div class="recap-pill">⏱️ <span>${escHtml(state.timeAvail)}</span></div>
+    <div class="recap-pill">👥 <span>${escHtml(state.groupSize)}</span></div>
+    <div class="recap-pill">💰 <span>${escHtml(state.budget)}</span></div>
+    <div class="recap-pill">🕐 <span>Within ${escHtml(travelLabel)}</span></div>`;
 
-  const diffClass = {Easy:'diff-easy',Medium:'diff-medium',Hard:'diff-hard'}[q.difficulty]||'diff-medium';
+  const diffKey = (q.difficulty||'Medium').toLowerCase();
+  const diffClass = {easy:'diff-easy',medium:'diff-medium',hard:'diff-hard'}[diffKey]||'diff-medium';
+  const diffIcon = {Easy:'🌱',Medium:'⚡',Hard:'🔥'}[q.difficulty]||'⚡';
   const stepsHtml = (q.steps||[]).map(s => `<li>${escHtml(s)}</li>`).join('');
   const bringHtml = (q.whatToBring||[]).map(b => `<li>${escHtml(b)}</li>`).join('');
 
   document.getElementById('quest-output').innerHTML = `
     <div class="quest-banner">
-      <div class="difficulty-badge ${diffClass}" style="display:inline-block;padding:3px 12px;border-radius:100px;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.85rem">${q.difficulty} quest</div>
+      <div class="${diffClass}" style="display:inline-block;padding:3px 12px;border-radius:100px;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.85rem">${escHtml(q.difficulty)} quest</div>
       <div class="quest-title-big">${escHtml(q.title)}</div>
       <div class="quest-tagline-big">${escHtml(q.tagline)}</div>
     </div>
@@ -635,7 +646,7 @@ function renderFullQuest(q) {
       <div class="meta-card"><div class="meta-val">⏱️ ${escHtml(q.estimatedTime)}</div><div class="meta-key">Est. time</div></div>
       <div class="meta-card"><div class="meta-val">💰 ${escHtml(q.estimatedCost)}</div><div class="meta-key">Est. cost</div></div>
       <div class="meta-card"><div class="meta-val">🕐 ${escHtml(travelLabel)}</div><div class="meta-key">Max travel</div></div>
-      <div class="meta-card"><div class="meta-val">${{Easy:'🌱',Medium:'⚡',Hard:'🔥'}[q.difficulty]||'⚡'}</div><div class="meta-key">${escHtml(q.difficulty)}</div></div>
+      <div class="meta-card"><div class="meta-val">${diffIcon}</div><div class="meta-key">${escHtml(q.difficulty)}</div></div>
     </div>
     <div class="section-block">
       <h3><span class="s-icon ip">📜</span> Mission brief</h3>
